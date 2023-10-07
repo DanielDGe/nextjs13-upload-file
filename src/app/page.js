@@ -1,95 +1,73 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import Image from "next/image";
+
+function HomePage() {
+
+  const [file, setFile] = useState();
+
+  const handleSubmit = async (e) => {
+
+    e.preventDefault();
+    if (!file) return;
+
+    try {
+
+      const data = new FormData();
+      data.set("file", file);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: data,
+      });
+      console.log(res);
+
+      if (res.ok) {
+        console.log("File uploaded successfully");
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
+
+  };
+
+  const handleFileChange = (e) => {
+    if (!e.target.files?.[0]) return;
+    setFile(e.target.files?.[0]);
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex h-screen justify-center items-center">
+      <div className="bg-zinc-950 p-5">
+        <h1 className="text-4xl text-center my-4">Upload a file</h1>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="file"
+            className="bg-zinc-900 text-zinc-100 p-2 rounded block mb-2"
+            onChange={handleFileChange}
+          />
+
+          <button
+            className="bg-green-900 text-zinc-100 p-2 rounded block w-full disabled:opacity-50"
+            disabled={!file}
           >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+            Upload
+          </button>
+        </form>
+        {file && (
+          <Image
+            src={URL.createObjectURL(file)}
+            alt="Uploaded file"
+            className="w-64 h-64 object-contain mx-auto"
+            width={256}
+            height={256}
+          />
+        )}
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    </div>
+  );
 }
+
+export default HomePage;
